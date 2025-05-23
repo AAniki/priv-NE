@@ -1044,6 +1044,8 @@ let messages = [
     { role: "assistant", content: "PASS-chat" },
     { role: "user", content: "まにまに『テス勉せいや( '▽')』" },
     { role: "assistant", content: "なんでテスト抜けてきてるんですかねぇ...(疑問)" },
+    { role: "user", content: "Ishi(o^―^o)『AIくんじゃん\nなんか田舎の絵描いて』" },
+    { role: "assistant", content: "GENERATE-IMG*A peaceful countryside landscape at sunset, with rolling hills, a small river, trees in full bloom, and a dirt path winding through the scene. Soft golden light, cinematic composition, high detail, trending on ArtStation.*ちょっと自然を感じる絵にしてみたよ" },
     { role: "system", content: "以上でオリエンテーションを終わりにします。以降会話をしてください。" }
 ];
 
