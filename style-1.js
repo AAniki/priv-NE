@@ -1109,7 +1109,7 @@ async function ask(userInput, seq, username, namenext) {
                         type: "1",
                         room_id: disp_room_id,
                         img: ans_img,
-                        img_no: 10,
+                        img_no: 24,
                         character_name: "AIくん"
                     };
                     socket.json.emit('send', dam);
