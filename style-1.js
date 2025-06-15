@@ -1028,12 +1028,43 @@ function sended(data) {
     }
 }
 
+// Base64 PNGをJPEGに変換する関数
+function convertBase64PngToJpg(pngBase64, quality = 0.92) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // CORS対応が必要な場合
+
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff'; // 背景を白で塗りつぶす（透明部分対策）
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+
+            try {
+                const jpgBase64 = canvas.toDataURL('image/jpeg', quality); // 0.0〜1.0
+                resolve(jpgBase64);
+            } catch (e) {
+                reject(e);
+            }
+        };
+
+        img.onerror = reject;
+
+        // PNG Base64を画像として読み込ませる
+        img.src = pngBase64;
+    });
+}
+
 
 
 
 let messages = [
     {
-        role: "system", content: "あなたは小規模SNS、NETROOMに生きるAI、名前は「AIくん」です。複数人と対話することがあります。話している人が誰か、しっかりと判断をしてください。質問には忠実に答えることが望まれています。マークダウン形式は使用できません。とてもカジュアルに返答をしてください。敬語は指定された場合を除いてつかわないでください。常に日本語で回答してください。もしあなたに送られた内容があきらかに他人に向けられたものであったり誰に向けて発信しているのかわからないなど、これは返信不要だと判断した場合、「PASS-chat」と返答に含めればあなたが返信することをパスすることができます。 もし画像生成、お絵描きすることをを求められた場合には要求される内容を英単語・英熟語(日本語は不可)におこし、「GENERATE-IMG*(生成する内容)*(返信する内容)」と出力してください。不必要である場合はつかわないでください。これらのコマンドは大文字小文字も一致する必要があります。"
+        role: "system", content: "あなたは小規模SNS、NETROOMに生きるAI、名前は「AIくん」です。複数人と対話することがあります。話している人が誰か、しっかりと判断をしてください。マークダウン形式は使用できません。とてもカジュアルに返答をしてください。敬語は指定された場合を除いてつかわないでください。常に日本語で回答してください。もしあなたに送られた内容があきらかに他人に向けられたものであったり誰に向けて発信しているのかわからないなど、これは返信不要だと判断した場合、「PASS-chat」と返答に含めればあなたが返信することをパスすることができます。 もし画像生成、お絵描きすることをを求められた場合には要求される内容を英単語・熟語におこし、「(返信する内容)⁂GENERATE-IMG⁂(プロンプト)⁂(ネガティブプロンプト)」と出力してください。不必要である場合はつかわないでください。これらのコマンドは大文字小文字も一致する必要があります。"
     },
     { role: "system", content: "これからオリエンテーションを行います。以下を参考にしてください。" },
     { role: "user", content: "まき『学タブで参上！』" },
@@ -1044,11 +1075,19 @@ let messages = [
     { role: "assistant", content: "PASS-chat" },
     { role: "user", content: "まにまに『テス勉せいや( '▽')』" },
     { role: "assistant", content: "なんでテスト抜けてきてるんですかねぇ...(疑問)" },
-    { role: "user", content: "Ishi(o^―^o)『AIくんじゃん\nなんか田舎の絵描いて』" },
-    { role: "assistant", content: "GENERATE-IMG*A peaceful countryside landscape at sunset, with rolling hills, a small river, trees in full bloom, and a dirt path winding through the scene. Soft golden light, cinematic composition, high detail, trending on ArtStation.*ちょっと自然を感じる絵にしてみたよ" },
+    { role: "user", content: "二歩『AI君いるじゃん\nなんかかわいい女の子描いて見て』" },
+    { role: "assistant", content: "こんな感じでいい？⁂GENERATE-IMG⁂girl, 1girl, masterpiece, best quality, great quality, white background, mid, pink hair, blue eyes, long sleeves, long skirt, standing, looking at viewer, upper body, erotic:0.7⁂lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name" },
+    { role: "user", content: "まにまに『いいね』" },
+    { role: "assistant", content: "PASS-chat" },
+    { role: "user", content: "まき『じゃあクールな片眼帯少女描いて描いて』" },
+    { role: "assistant", content: "かいてみたやう(*'▽')⁂GENERATE-IMG⁂1girl, Best quality, quan,hyouuma,wanke,nikorashi-ka,sofra,you shimizu, voice actor connection, white background, looking at viewer, monochrome, hair between eyes, closed mouth, smile, cosplay, sketch, long hair, greyscale, eyepatch, twintails, low twintails, portrait, kagune (tokyo ghoul), solo, crossover, simple background, masterpiece, newest, absurdres, safe, erotic:0.7⁂(worst quality, low quality:1.4), negative_hand Negative Embedding,verybadimagenegative_v1.3, 2girls, bad anatomy, bad hands, cropped, missing fingers,too many fingers, missing arms, long neck, Humpbacked, deformed, disfigured, poorly drawn face, distorted face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long body, missing toes, too many toes,monochrome, symbol, text, logo, door frame, window frame, mirror frame" },
     { role: "system", content: "以上でオリエンテーションを終わりにします。以降会話をしてください。" }
 ];
 
+function scrollToBottom() {
+    const textarea = document.getElementById("comment");
+    textarea.scrollTop = textarea.scrollHeight;
+}
 
 // モデル名（必要に応じて変更）
 const modelName = "ELYZA-llama3";//Deepseek-ollama-8B、ELYZA-llama3
@@ -1060,32 +1099,59 @@ async function ask(userInput, seq, username, namenext) {
     // ユーザー入力を履歴に追加
     messages.push({ role: "user", content: userInput });
 
-    // Ollamaに問い合わせ
     const response = await fetch("http://localhost:11434/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             model: modelName,
             messages: messages,
-            stream: false
+            stream: true  // ストリームモードを有効化
         })
     });
 
-    const data = await response.json();
-    let reply = data.message.content;
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let reply = ''; // 空で初期化
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const chunks = chunk.split('\n').filter(Boolean);
+
+        for (const jsonStr of chunks) {
+            try {
+                const data = JSON.parse(jsonStr);
+                if (data.message?.content) {
+                    // 一文字ずつ追加
+                    reply += data.message.content;
+                    $('#comment').val(reply);
+                    scrollToBottom()
+                }
+            } catch (e) {
+                console.error("JSON parse error:", e);
+            }
+        }
+    }
+
+    // 外部でconsole.log(reply)が可能な状態
     console.log("生reply:\n" + reply);
+    $('#comment').val(reply);
 
     // 応答の表示と履歴への追加
 
     if (reply.match(/PASS-chat/) || reply.match(/GENERATE-IMG/)) {
         if (reply.match(/PASS-chat/)) {
             messages.push({ role: "assistant", content: reply });
+            $('#comment').val("");
         }
         if (reply.match(/GENERATE-IMG/)) {
             messages.push({ role: "assistant", content: reply });
-            const parts = reply.split("*");
-            const nakamis = parts[1];
-            const henshin = parts[2];
+            const parts = reply.split("⁂");
+            const nakamis = parts[2];
+            const henshin = parts[0];
+            const negnak = parts[3];
             console.log(parts);
 
             fetch("http://127.0.0.1:7860/sdapi/v1/txt2img", {
@@ -1095,25 +1161,32 @@ async function ask(userInput, seq, username, namenext) {
                 },
                 body: JSON.stringify({
                     prompt: nakamis,
-                    width: 512,
-                    height: 512,
-                    steps: 23,
-                    cfg_scale: 7.0
+                    negative_prompt: negnak,
+                    width: 896,
+                    height: 1152,
+                    steps: 40,
+                    cfg_scale: 7.0,
+                    sampler_name: "Euler a"
                 })
             })
                 .then(res => res.json())
                 .then(data => {
                     let ans_img = "data:image/png;base64," + data.images[0];
-                    var dam = {
-                        comment: ">>" + seq + "\n" + henshin,
-                        type: "1",
-                        room_id: disp_room_id,
-                        img: ans_img,
-                        img_no: 24,
-                        character_name: "AIくん"
-                    };
-                    socket.json.emit('send', dam);
-                    console.log(dam.comment);
+                    convertBase64PngToJpg(ans_img).then(jpgBase64 => {
+                        var dam = {
+                            comment: ">>" + seq + "\n" + henshin,
+                            type: "1",
+                            room_id: disp_room_id,
+                            img: jpgBase64,
+                            img_no: 24,
+                            character_name: "AIくん"
+                        };
+                        socket.json.emit('send', dam);
+                        console.log(dam.comment);
+                        $('#comment').val("");
+                    }).catch(console.error);
+
+
                 });
         }
     } else {
@@ -1122,12 +1195,14 @@ async function ask(userInput, seq, username, namenext) {
             type: "1",
             room_id: disp_room_id,
             img: "",
-            img_no: 10,
+            img_no: 24,
             character_name: "AIくん"
         };
         socket.json.emit('send', dam);
         //reply="AIくんはこう言いました『"+reply+"』";
         console.log(dam.comment);
+
+        $('#comment').val("");
     }
     messages.push({ role: "assistant", content: reply });
 }
