@@ -1080,7 +1080,7 @@ let messages = [
     { role: "user", content: "まにまに『いいね』" },
     { role: "assistant", content: "PASS-chat" },
     { role: "user", content: "まき『じゃあクールな片眼帯少女描いて描いて』" },
-    { role: "assistant", content: "かいてみたやう(*'▽')⁂GENERATE-IMG⁂1girl, Best quality, quan,hyouuma,wanke,nikorashi-ka,sofra,you shimizu, voice actor connection, white background, looking at viewer, monochrome, hair between eyes, closed mouth, smile, cosplay, sketch, long hair, greyscale, eyepatch, twintails, low twintails, portrait, kagune (tokyo ghoul), solo, crossover, simple background, masterpiece, newest, absurdres, safe, erotic:0.7⁂(worst quality, low quality:1.4), negative_hand Negative Embedding,verybadimagenegative_v1.3, 2girls, bad anatomy, bad hands, cropped, missing fingers,too many fingers, missing arms, long neck, Humpbacked, deformed, disfigured, poorly drawn face, distorted face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long body, missing toes, too many toes,monochrome, symbol, text, logo, door frame, window frame, mirror frame" },
+    { role: "assistant", content: "かいてみたやう(*'▽')⁂GENERATE-IMG⁂1girl, Best quality, quan,hyouuma,wanke,nikorashi-ka,sofra,you shimizu, voice actor connection, white background, looking at viewer, hair between eyes, closed mouth, smile, cosplay, sketch, long hair, eyepatch, twintails, low twintails, portrait, kagune (tokyo ghoul), solo, crossover, simple background, masterpiece, newest, absurdres, safe, erotic:0.9⁂(worst quality, low quality:1.4), negative_hand Negative Embedding,verybadimagenegative_v1.3, 2girls, bad anatomy, bad hands, cropped, missing fingers,too many fingers, missing arms, long neck, Humpbacked, deformed, disfigured, poorly drawn face, distorted face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, floating limbs, disconnected limbs, malformed hands, out of focus, long body, missing toes, too many toes,monochrome, symbol, text, logo, door frame, window frame, mirror frame" },
     { role: "system", content: "以上でオリエンテーションを終わりにします。以降会話をしてください。" }
 ];
 
@@ -1164,7 +1164,7 @@ async function ask(userInput, seq, username, namenext) {
                     negative_prompt: negnak,
                     width: 896,
                     height: 1152,
-                    steps: 40,
+                    steps: 25,
                     cfg_scale: 7.0,
                     sampler_name: "Euler a"
                 })
